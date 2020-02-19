@@ -1,0 +1,15 @@
+serve endpoints for db warehouse for image metadata, and all other data types
+centralize service to multiple applications
+tunnel through ngrok
+additional computations will be served from clib as c++
+...
+
+c++ bindings refs
+=================
+* https://www.youtube.com/watch?v=YZomx3Jt4Xs
+* https://www.youtube.com/watch?v=NpyRZsbdJXE
+* https://github.com/sn99/rust-ffi-examples/tree/master/cpp-to-rust
+
+rocket intro
+============
+* https://www.youtube.com/watch?v=dQXD2IcFBT4
