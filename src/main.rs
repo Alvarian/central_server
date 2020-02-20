@@ -1,9 +1,16 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![feature(plugin, const_fn, proc_macro_hygiene, decl_macro)]
 use rocket::*;
 
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
+extern crate r2d2;
+extern crate r2d2_diesel;
+
+#[macro_use]
+extern crate serde;
+#[macro_use]
+extern crate serde_json;
 
 use dotenv::dotenv;
 use std::env;
@@ -12,35 +19,26 @@ use diesel::pg::PgConnection;
 
 mod schema;
 mod models;
+mod db;
+mod routes;
+use crate::routes::*;
 
 
-#[get("/hello/<name>/<age>")]
-fn hello(name: String, age: u8) -> String {
-	format!("Hello {} year old named {}!", age, name)
-}
-
-#[get("/porfolio/api/all")]
-fn all() -> String {
-	format!(models::Book::all(&conn))
-}
-
-fn main() {
+fn rocket() -> rocket::Rocket {
 	dotenv().ok();
 
 	let database_url = env::var("DATABASE_URL").expect("set DATABASE_URL");
-	let conn = PgConnection::establish(&database_url).unwrap();
 
-	let book = models::NewBook {
-		title: String::from("Gravity's Rainbow"),
-		author: String::from("Thomas Pynchon"),
-		published: true,
-	};
+	let pool = db::init_pool(database_url);
+	rocket::ignite()
+		.manage(pool)
+		.mount(
+			"/api/v1/", 
+			routes![index, new, show, delete, author, update],
+		)
+		.register(catchers![not_found])
+}
 
-	if models::Book::insert(book, &conn) {
-		println!("success");
-	} else {
-		println!("failed");
-	}
-
-	// rocket::ignite().mount("/", routes![hello]).launch();
+fn main() {
+	rocket().launch();
 }

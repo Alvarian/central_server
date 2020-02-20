@@ -6,7 +6,7 @@ use crate::schema;
 use schema::books;
 use schema::books::dsl::books as all_books;
 
-#[derive(Queryable)]
+#[derive(Serialize, Queryable, Debug, Clone)]
 pub struct Book {
 	pub id: i32,
 	pub title: String,
@@ -14,7 +14,7 @@ pub struct Book {
 	pub published: bool,
 }
 
-#[derive(Insertable)]
+#[derive(Serialize, Deserialize, Insertable)]
 #[table_name = "books"]
 pub struct NewBook {
 	pub title: String,
