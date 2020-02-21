@@ -2,41 +2,33 @@ use crate::db::Conn as DbConn;
 // #![feature(plugin, const_fn, proc_macro_hygiene, decl_macro)]
 use rocket::*;
 use rocket_contrib::json::Json;
-use crate::models::portfolio::{Book, NewBook};
+use crate::models::portfolio::{Project, NewProject};
 use serde_json::Value;
 
-#[get("/books", format = "application/json")]
+// GET AT PROJECTS
+#[get("/projects", format = "application/json")]
 pub fn index(conn: DbConn) -> Json<Value> {
-	let books = Book::all(&conn);
+	let projects = Project::all(&conn);
 
 	Json(json!({
 		"status": 200,
-		"result": books,
+		"result": projects,
 	}))
 }
 
-#[post("/books", format = "application/json", data = "<new_book>")]
-pub fn new(conn: DbConn, new_book: Json<NewBook>) -> Json<Value> {
+// POST ONE PROJECT
+#[post("/projects", format = "application/json", data = "<new_project>")]
+pub fn new(conn: DbConn, new_project: Json<NewProject>) -> Json<Value> {
 	Json(json!({
-		"status": Book::insert(new_book.into_inner(), &conn),
-		"result": Book::all(&conn).first(),
+		"status": Project::insert(new_project.into_inner(), &conn),
+		"result": Project::all(&conn).first(),
 	}))
 }
 
-#[get("/books/<id>", format = "application/json")]
-pub fn show(conn: DbConn, id: i32) -> Json<Value> {
-	let result = Book::show(id, &conn);
-	let status = if result.is_empty() { 404 } else { 200 };
-
-	Json(json!({
-		"status": status,
-		"result": result.get(0),
-	}))
-}
-
-#[put("/books/<id>", format = "application/json", data = "<book>")]
-pub fn update(conn: DbConn, id: i32, book: Json<NewBook>) -> Json<Value> {
-	let status = if Book::update_by_id(id, &conn, book.into_inner()) {
+// UPDATE ONE PROJECT
+#[put("/projects/<id>", format = "application/json", data = "<project>")]
+pub fn update(conn: DbConn, id: i32, project: Json<NewProject>) -> Json<Value> {
+	let status = if Project::update_by_id(id, &conn, project.into_inner()) {
 		200
 	} else { 404 };
 
@@ -46,9 +38,10 @@ pub fn update(conn: DbConn, id: i32, book: Json<NewBook>) -> Json<Value> {
 	}))
 }
 
-#[delete("/books/<id>")]
+// DELETE ONE PROJECT
+#[delete("/projects/<id>")]
 pub fn delete(id: i32, conn: DbConn) -> Json<Value> {
-	let status = if Book::delete_by_id(id, &conn) {
+	let status = if Project::delete_by_id(id, &conn) {
 		200
 	} else { 404 };
 
@@ -58,16 +51,7 @@ pub fn delete(id: i32, conn: DbConn) -> Json<Value> {
 	}))
 }
 
-#[get("/books/authors/<author>", format = "application/json")]
-pub fn author(author: String, conn: DbConn) -> Json<Value> {
-	let books = Book::all_by_author(author, &conn);
-
-	Json(json!({
-		"status": 200,
-		"result": books,
-	}))
-}
-
+// CATCH
 #[catch(404)]
 pub fn not_found() -> Json<Value> {
 	Json(json!({

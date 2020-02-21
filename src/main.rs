@@ -21,7 +21,7 @@ mod schemas;
 mod models;
 mod db;
 mod routes;
-use crate::routes::portfolio::*;
+use routes::*;
 
 
 fn rocket() -> rocket::Rocket {
@@ -33,10 +33,15 @@ fn rocket() -> rocket::Rocket {
 	rocket::ignite()
 		.manage(pool)
 		.mount(
-			"/api/v1/", 
-			routes![index, new, show, delete, author, update],
+			"/portfolio/api/v1/", 
+			routes![
+				portfolio::index, 
+				portfolio::new,  
+				portfolio::delete, 
+				portfolio::update
+			],
 		)
-		.register(catchers![not_found])
+		.register(catchers![portfolio::not_found])
 }
 
 fn main() {
