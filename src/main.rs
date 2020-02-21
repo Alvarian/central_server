@@ -17,11 +17,11 @@ use std::env;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
-mod schema;
+mod schemas;
 mod models;
 mod db;
 mod routes;
-use crate::routes::*;
+use crate::routes::portfolio::*;
 
 
 fn rocket() -> rocket::Rocket {
