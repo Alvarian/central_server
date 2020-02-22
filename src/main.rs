@@ -35,10 +35,12 @@ fn make_cors() -> Cors {
 	dotenv().ok();
 
 	// WILL BE LIST OF ADDRESS ROOTS. UPDATE THIS WHEN I KNOW HOW TO MAP LIST OF ENVS AS ARRAY
-	let portfolio_address = env::var("PORTFOLIO_ROOT_ADDRESS").expect("set PORTFOLIO_ROOT_ADDRESS");
+	let portfolio_prod_address = env::var("PORTFOLIO_PROD_ROOT_ADDRESS").expect("set PORTFOLIO_PROD_ROOT_ADDRESS");
+    let portfolio_dev_address = env::var("PORTFOLIO_DEV_ROOT_ADDRESS").expect("set PORTFOLIO_DEV_ROOT_ADDRESS");
     
     let allowed_origins = AllowedOrigins::some_exact(&[ // 4.
-        portfolio_address,
+        portfolio_prod_address,
+        portfolio_dev_address,
     ]);
 
     CorsOptions { // 5.
